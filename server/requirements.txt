@@ -1,0 +1,8 @@
+requests
+google-cloud-firestore
+firebase-admin
+flask
+flask-cors
+mypy
+graphene
+flask-graphql
