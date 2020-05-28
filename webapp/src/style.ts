@@ -10,6 +10,9 @@ const useStyles = makeStyles((theme) => ({
   title: {
     flexGrow: 1,
   },
+  text: {
+    color: "red"
+  },
 }));
 
 export {useStyles};

@@ -1,77 +1,76 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {AppBar, Button, Fade, IconButton, Menu, MenuItem, Toolbar, Typography} from '@material-ui/core';
+import {
+  AppBar, Box,
+  Button,
+  Fade,
+  IconButton,
+  List,
+  ListItem,
+  Menu,
+  MenuItem,
+  Popover,
+  Toolbar,
+  Typography
+} from '@material-ui/core';
 import {useStyles} from "./style";
 import MenuIcon from '@material-ui/icons/Menu';
 import AddIcon from '@material-ui/icons/Add';
-import {Game, getAllGames, createGame} from "./requests";
 import {useHistory} from 'react-router-dom';
+import gql from 'graphql-tag';
+import {useCreateGameMutation, useGetAllGamesQuery} from "./generated/graphql";
+import useGameView from "./useGameView";
 
-const NavBar = (props: {title: string}) => {
-  const classes = useStyles();
-  const [anchor, setAnchor] = useState<null | any>(null);
-  const [games, setGames] = useState<Game[]>([]);
+gql`
+  mutation createGame($name: String!, $x: Int!, $y: Int!, $width: Int!, $height: Int!) {
+      createGame(name: $name, x: $x, y: $y, width: $width, height: $height) {
+          game {
+              id
+          }
+      }
+  }
+`;
+
+
+export const CreateGameButton = () => {
+  const [createGameMutation, createGameResult] = useCreateGameMutation();
+  const [cellsX, cellsY] = useGameView({cellSize: 50});
   const history = useHistory();
 
   useEffect(() => {
-    (async () => {
-      const games = await getAllGames();
-      setGames(games);
-    })();
-  }, [setGames]);
-
-  const handleClick = useCallback((event: React.MouseEvent) => {
-    setAnchor(event.currentTarget);
-  }, [setAnchor]);
-
-  const handleClose = useCallback((event: React.MouseEvent) => {
-    event.stopPropagation();
-    event.preventDefault();
-    setAnchor(null);
-  }, [setAnchor]);
-
-  const handleGameSelect = useCallback((gameId: string) => {
-    history.push(`/game/${gameId}`);
-  }, [history]);
+    if (!createGameResult.data) {
+      return;
+    }
+    history.push(`/game/${createGameResult.data.createGame.game.id}`)
+  }, [createGameResult]);
 
   const handleNewGame = useCallback(() => {
-    (async () => {
-      const game = await createGame('New Game');
-      history.push(`/game/${game.id}`);
-    })();
-  }, []);
+    createGameMutation({
+      variables: {
+        name: "New Game",
+        x: 0,
+        y: 0,
+        width: cellsX,
+        height: cellsY
+      }
+    });
+  }, [createGameMutation]);
 
   return (
-    <AppBar position="static">
+    <Button color="inherit">
+      <AddIcon onClick={handleNewGame} />
+    </Button>
+  );
+};
+
+
+export const NavBar = (props: {children: React.ReactNode}) => {
+  const classes = useStyles();
+  return (
+    <AppBar className={classes.root} position="sticky">
       <Toolbar>
-        <IconButton
-            edge="start"
-            className={classes.menuButton}
-            color="inherit"
-            aria-controls="nav-menu"
-            onClick={handleClick}>
-          <MenuIcon />
-          <Menu
-              id="nav-menu"
-              anchorEl={anchor}
-              keepMounted
-              open={anchor !== null}
-              onClose={handleClose}
-              TransitionComponent={Fade}
-          >
-            {games.map(game => (
-              <MenuItem onClick={() => handleGameSelect(game.id)}>{game.name}</MenuItem>
-            ))}
-          </Menu>
-        </IconButton>
-        <Typography variant="h6" className={classes.title}>
-          {props.title}
-        </Typography>
-        <Button color="inherit">
-          <AddIcon onClick={handleNewGame} />
-        </Button>
+        {props.children}
       </Toolbar>
     </AppBar>
   );
 };
 
-export {NavBar};

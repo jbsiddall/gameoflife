@@ -5,4 +5,6 @@ flask
 flask-cors
 mypy
 graphene
+graphene-stubs
 flask-graphql
+fireo

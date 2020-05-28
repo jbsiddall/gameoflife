@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-deployment
+  labels:
+    app: hello-world-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-deployment
+  template:
+    metadata:
+      labels:
+        app: hello-world-deployment
+    spec:
+      containers:
+      - name: hello-world-server
+        image: eu.gcr.io/helloworld-278017/hello-world-server:latest
+        ports:
+          - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world-server-load-balancer
+  labels:
+    app: hello-world-deployment
+spec:
+  type: LoadBalancer
+  selector:
+    app: hello-world-deployment
+  ports:
+    - nodePort: 31524
+      port: 5000
+      protocol: TCP
+      targetPort: 5000

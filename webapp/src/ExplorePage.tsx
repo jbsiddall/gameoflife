@@ -1,11 +1,19 @@
 import React from 'react';
-import { Container, Box, Button } from '@material-ui/core';
-import {NavBar} from "./NavBar";
+import {Container, Box, Button, Typography} from '@material-ui/core';
+import {NavBar, CreateGameButton} from "./NavBar";
+import {useStyles} from "./style";
 
 const ExplorePage = () => {
+  const classes = useStyles();
+
   return (
       <Box>
-        <NavBar title="Explore"/>
+        <NavBar>
+          <Typography variant="h6" className={classes.title}>
+            Explore
+          </Typography>
+          <CreateGameButton/>
+        </NavBar>
         <Container>
           contents goes here
         </Container>
