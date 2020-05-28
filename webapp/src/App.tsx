@@ -13,7 +13,7 @@ import theme from "./theme";
 
 
 const client = new ApolloClient({
-  uri: 'http://localhost:5000/graphql',
+  uri: 'https://helloworld-278017.ew.r.appspot.com/graphql',
 });
 
 const InnerContent = () => {
